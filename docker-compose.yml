@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  server:
+    build: ./server
+    ports: 
+      - "5000:5000"
+    volumes:
+      - ./server:/app
+    env_file:
+      - ./server/.env
+    networks:
+      - isolation-network
+    depends_on:
+      - "db"
+  service:
+    build: ./service
+    networks:
+      - isolation-network
+    restart: on-failure
+    depends_on:
+      - "server"
+  db:
+    image: "postgres"
+    container_name: "postgres_container"
+    ports:
+      - "54320:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    networks:
+      - isolation-network
+
+volumes:
+  dbdata:
+
+networks:
+  isolation-network:
+    driver: bridge
